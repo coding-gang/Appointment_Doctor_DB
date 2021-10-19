@@ -123,7 +123,15 @@ end if;
 END
 call Del_Doctor_Proc(9);
 
- 
+----------------------------------------
+ DELIMITER %%
+create procedure `show_All_Doctor` ()
+begin
+	select * from doctors;
+end;
+DELIMITER;
+call show_All_Doctor()
+
  /* END DOCTOR*/
 ----------------------------------------------------- 
   /*SPECIALITIES*/
@@ -147,7 +155,8 @@ call Add_Specialities_Proc('Răng');
 CREATE DEFINER=`root`@`localhost` PROCEDURE `Update_Specialities_Proc`(in idParem int, in specialitiesParam varchar(50))
 BEGIN
 declare result varchar(50);
-if exists (select * from specialities where specialityId =  idParem) and  exists(select * from specialities where specialityId =  idParem and speciallityName <>specialitiesParam) 
+if exists (select * from specialities where specialityId =  idParem) and  
+exists(select * from specialities where specialityId =  idParem and speciallityName <>specialitiesParam) 
 	then
     update specialities set specialities.speciallityName = specialitiesParam where specialities.specialityId =idParem;
     set result = "Cập nhật thành công";
@@ -176,25 +185,191 @@ END
 call Del_Specialities_Proc(8);
 
  /* END SPECIALITIES*/
- 
 /* -- END STORE PROCEDURES--*/
+drop procedure show_All_Doctor
+
+/* patients */
+select * from patients
+
+drop procedure Add_Patient_Proc;
+DELIMITER %%
+create procedure `Add_Patient_Proc`(
+fName varchar(50),
+lName varchar(50),
+mail varchar(50),
+phoneNumber varchar(10),
+gender bit,
+password varchar(50),
+roleId int
+)
+begin 
+	declare result varchar(50);
+	insert into patients(`firstName`,`lastName`,`email`,`phone`,`gender`,`password`,`roleId`)
+	values(fName,lName,mail,phoneNumber,gender,password,roleId);
+	set result ="Thêm dữ liệu thành công";
+	select result;
+end;
+DELIMITER;
+call Add_Patient_Proc('Tèo','Nguyễn Văn','@dlu','0909190011',1,'123',1)
+select * from patients
+
+--------------------------------------------
+CREATE DEFINER=`root`@`localhost` PROCEDURE `Update_Patient_Proc`(
+paId int,
+fName varchar(50),
+lName varchar(50),
+mail varchar(50),
+phoneNumber varchar(10),
+gt bit,
+pass varchar(50),
+rolId int
+)
+BEGIN
+declare result varchar(50);
+if exists (select * from patients where  
+patientId = paId and (firstName <> fName  or lastName <> lName or email <> mail or phone <> phoneNumber
+or gender <> gt or password <> pass or roleId <> rolId )) then
+	 update patients set firstName = fName, lastName = lName, email = mail, phone = phoneNumber,
+    gender = gt, password = pass , roleId = rolId where patientId = paId; 
+    set result ="Cập nhật dữ liệu thành công";
+    select result;
+else
+	set result = "Kiểm tra lại dữ liệu cần cập nhật";
+    select result;
+end if;
+END
+call Update_Patient_Proc(1,'Triển','Nguyễn Văn dinh','@dkưe3','1111111111',1,'123',1)
 
 
+---------------------------------
+DELIMITER %%
+CREATE DEFINER=`root`@`localhost` PROCEDURE `Del_Patient_Proc`(in id int)
+BEGIN
+declare result varchar(50);
+if exists (select * from patients where patientId = id) and
+	not exists (select * from appointments where patientId = id) then
+    Delete from patients where patientId = id;
+    set result = "Xoá dữ liệu thành công";
+    select result;
+else
+ set result = "Không thể xoá dữ liệu";
+ select result;
+end if;
+END;
+DELIMITER;
 
+DELIMITER %%
+create procedure `SHOW_ALL_PATIENT`()
+begin
+select * from patients;
+end;
+DELIMITER;
+call SHOW_ALL_PATIENT();
 
+---------------------
+CREATE DEFINER=`root`@`localhost` PROCEDURE `Add_Scheduletiming_Proc`(
+bookDate date,
+atBegin Time,
+atEnd Time,
+doctorId int,
+status bit
+)
+BEGIN
+declare result varchar(50);
+insert into `scheduletimings`(`bookDate`,`atBegin`,`atEnd`,`doctorId`,`status`) values (bookDate,atBegin, atEnd, doctorId, status);
+set result = "Thêm dữ liệu thành công";
+select result;
+END;
+call Add_Scheduletiming_Proc('2021-09-03','9:30','10:00',1,1);
+select * from scheduletimings
 
+CREATE DEFINER=`root`@`localhost` PROCEDURE `Update_Scheduletimings_Proc`(
+id int,
+bDate date,
+atbegin Time,
+atend Time,
+docId int,
+stat bit
+)
+BEGIN
+declare result varchar(50);
+if exists(select * from Scheduletimings where scheduleTimingId = id and
+(bookDate <> bDate or atBegin<> atbegin or atEnd <> atEnd or  doctorId <> docId or status <> stat)) then
+	update Scheduletimings set bookDate = bDate , atBegin= atbegin, atEnd =atEnd, doctorId = docId ,status = stat
+    where scheduleTimingId = id;
+    set result = "Cập nhật dữ liệu thành công";
+	select result;
+else 
+	set result = "Kiểm tra lại thông tin cập nhật";
+    select result;
+end if;
+END
+call Update_Scheduletimings_Proc(1,'2021-09-04','9:30','10:00',1,1);
 
+call Del_Scheduletimings_Proc(1);
 
+---------------------------
 
+/* ------Amind_Proc ------ */
+CREATE DEFINER=`root`@`localhost` PROCEDURE `Add_Admin_Proc`(
+username varchar(50),
+password varchar(50),
+roleId int
+)
+BEGIN
+declare isExistUser int;
+set isExistUser = (select IsExist_UserName_func(username));
+if(isExistUser <= 0) then
+	insert into admins(userName,password,roleId) values(username,password,roleId);
+     select concat('Thêm người dùng ',username,' thành công');
+else
+	select concat('Đã tồn tại ',username,' trong csdl');
+end if;
+END;
+call Add_Admin_Proc('adads','adads',1)
+select * from admins
 
+CREATE DEFINER=`root`@`localhost` PROCEDURE `Update_Amind_Proc`(
+id int,
+username varchar(50),
+pass varchar(50),
+rolId int
+)
+BEGIN
+declare isExistUser int;
+set isExistUser = (select IsExist_UserName_func(username));
+if(isExistUser <= 0) or exists(select * from admins where adminId = id and( password <> pass or roleId <> rolId)) then
+	update admins set adminId = id, userName = username, password = pass , roleId = rolId 
+    where adminId = id;
+    select "cập nhật dữ liệu thành công";
+else
+	select concat('Cập nhật không thay đổi');
+end if;
+END
+call Update_Amind_Proc(3,'tèo','123',1);
 
+CREATE DEFINER=`root`@`localhost` PROCEDURE `Add_Admin_Proc`(
+username varchar(50),
+password varchar(50),
+roleId int
+)
+BEGIN
+declare isExistUser int;
+set isExistUser = (select IsExist_UserName_func(username));
+if(isExistUser <= 0) then
+	insert into admins(userName,password,roleId) values(username,password,roleId);
+     select concat('Thêm người dùng ',username,' thành công');
+else
+	select concat('Đã tồn tại ',username,' trong csdl');
+end if;
+END;
 
-
-
-
-
-
-
-
-
+DELIMITER %%
+CREATE DEFINER=`root`@`localhost` PROCEDURE `Del_Admins_Proc`(in id int)
+BEGIN
+delete from admins where adminId =id;
+select "Xoá dữ liệu thành công";
+END;
+DELIMITER;
+ call Del_Admins_Proc(5);
 

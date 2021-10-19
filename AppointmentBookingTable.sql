@@ -69,5 +69,6 @@ FOREIGN KEY (roleId) REFERENCES roles(roleId) ON DELETE CASCADE on update cascad
 );
 
 SHOW TABLEs;
-select * from tables;
+select * from patients;
+call SHOW_ALL_BY_TABLE_NAME('doctors')
 
