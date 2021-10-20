@@ -210,7 +210,7 @@ begin
 	select result;
 end;
 DELIMITER;
-call Add_Patient_Proc('Tèo','Nguyễn Văn','@dlu','0909190011',1,'123',1)
+call Add_Patient_Proc('Tí','Nguyễn Văn','@dlu','0909190011',1,'123',1)
 select * from patients
 
 --------------------------------------------
@@ -265,21 +265,28 @@ select * from patients;
 end;
 DELIMITER;
 call SHOW_ALL_PATIENT();
+/* -------- End_Patients_Proc ----------- */
 
----------------------
+/* -------- Scheduletiming_Proc ----------- */
+DELIMITER %%
 CREATE DEFINER=`root`@`localhost` PROCEDURE `Add_Scheduletiming_Proc`(
 bookDate date,
 atBegin Time,
 atEnd Time,
-doctorId int,
+docId int,
 status bit
 )
 BEGIN
-declare result varchar(50);
-insert into `scheduletimings`(`bookDate`,`atBegin`,`atEnd`,`doctorId`,`status`) values (bookDate,atBegin, atEnd, doctorId, status);
-set result = "Thêm dữ liệu thành công";
-select result;
+if exists (select * from doctors where `doctorId` = docId) then
+	insert into scheduletimings(`bookDate`,`atBegin`,`atEnd`,`doctorId`,`status`) values (bookDate,atBegin, atEnd, docId, status);
+	select "Thêm dữ liệu thành công";
+else
+	select "Kiểm tra lại thông tin";
+end if;
 END;
+DELIMITER;
+select * from doctors
+drop procedure Add_Scheduletiming_Proc
 call Add_Scheduletiming_Proc('2021-09-03','9:30','10:00',1,1);
 select * from scheduletimings
 
@@ -306,9 +313,9 @@ end if;
 END
 call Update_Scheduletimings_Proc(1,'2021-09-04','9:30','10:00',1,1);
 
-call Del_Scheduletimings_Proc(1);
+call Del_Scheduletimings_Proc(24);
 
----------------------------
+/* ------End_Scheduletimings_Proc ------ */
 
 /* ------Amind_Proc ------ */
 CREATE DEFINER=`root`@`localhost` PROCEDURE `Add_Admin_Proc`(
@@ -372,4 +379,77 @@ select "Xoá dữ liệu thành công";
 END;
 DELIMITER;
  call Del_Admins_Proc(5);
+ DELIMITER;
+ 
+ drop procedure SHOW_ALL_ADMINS_PROC
+ DELIMITER %%
+ create procedure `SHOW_ALL_ADMINS_PROC`()
+ begin
+	select * from admins;
+ end;
+ DELIMITER;
+ 
+call SHOW_ALL_ADMINS_PROC();
+/* ----- admins_proc ------------- */
+
+/* ---------- Appointmens_Procedere --------- */
+DELIMITER %%
+CREATE DEFINER=`root`@`localhost` PROCEDURE `Add_Appointments_Proc`(
+scheId int,
+paId int
+)
+BEGIN
+	if  exists(select * from scheduleTimings where `scheduleTimingId` = scheId) and
+		 exists(select * from patients where `patientId` =paId) then
+         insert into Appointments(`scheduleTimingId`,`patientId`) values(scheId, paId);
+         select "Thêm dữ liệu thành công";
+	else 
+		select "Kiểm tra lại thông tin" as message;
+	end if;
+END;
+DELIMITER;
+select * from patients;
+select * from scheduleTimings
+call  Add_Appointments_Proc(7,3);
+select * from appointments;
+
+DELIMITER %%
+CREATE DEFINER=`root`@`localhost` PROCEDURE `Update_Appointments_Proc`(
+appoinId int,
+scheId int,
+paId int)
+BEGIN
+if  exists(select * from scheduleTimings where `scheduleTimingId` = scheId) and
+		 exists(select * from patients where `patientId` =paId) and 
+         exists (select * from appointments where appointmentId =appoinId and (`scheduleTimingId` <> scheId or `patientId` <>paId))
+         then 
+         update appointments set `scheduleTimingId` = scheId , `patientId` =paId 
+         where appointmentId = appoinId;
+         select "Cập nhật thành công";
+else
+	select "Kiểm tra lại thông tin cập nhất";
+end if;
+END;
+DELIMITER
+call Update_Appointments_Proc(4,7,2);
+
+DELIMITER %%
+CREATE DEFINER=`root`@`localhost` PROCEDURE `Add_Appointments_Proc`(
+scheId int,
+paId int
+)
+BEGIN
+	if  exists(select * from scheduleTimings where `scheduleTimingId` = scheId) and
+		 exists(select * from patients where `patientId` =paId) then
+         insert into Appointments(`scheduleTimingId`,`patientId`) values(scheId, paId);
+         select "Thêm dữ liệu thành công";
+	else 
+		select "Kiểm tra lại thông tin" as message;
+	end if;
+END;
+DELIMITER;
+call Del_Appointment_Proc(5);
+
+/* ----- end appointment_proc ------------- */
+
 
