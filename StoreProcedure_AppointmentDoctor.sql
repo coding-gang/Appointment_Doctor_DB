@@ -135,7 +135,12 @@ call show_All_Doctor()
  /* END DOCTOR*/
 ----------------------------------------------------- 
   /*SPECIALITIES*/
-     DELIMITER %%
+  DELIMITER $$
+  create procedure `Show_All_Specialities_Proc`
+  
+  DELIMITER;
+  
+     DELIMITER $$
 CREATE  PROCEDURE `Add_Specialities_Proc`(IN speciallityNameParam varchar(50))
 BEGIN
 declare result varchar(50);
@@ -182,7 +187,7 @@ else
 end if;
 
 END
-call Del_Specialities_Proc(8);
+call Del_Specialities_Proc(3);
 
  /* END SPECIALITIES*/
 /* -- END STORE PROCEDURES--*/

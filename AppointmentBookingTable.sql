@@ -1,5 +1,5 @@
 create database `appointmentbookingdoctor`;
-use `appointmentbookingdoctor`;
+ use appointmentbookingdoctor;
 
 create table `roles`(
 roleId INT AUTO_INCREMENT,
@@ -70,5 +70,11 @@ FOREIGN KEY (roleId) REFERENCES roles(roleId) ON DELETE CASCADE on update cascad
 
 SHOW TABLEs;
 select * from patients;
-call SHOW_ALL_BY_TABLE_NAME('doctors')
+call SHOW_ALL_BY_TABLE_NAME('doctors');
+SHOW FULL TABLES IN appointmentbookingdoctor WHERE TABLE_TYPE LIKE 'VIEW';
 
+create view adminsView
+as
+select adminId,userName, password, nameRole from admins a
+inner join roles r on r.roleId = a.roleId;
+select * from specialities

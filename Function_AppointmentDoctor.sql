@@ -57,3 +57,62 @@ END;
 select print_MessageForAdmin_func(1,'nguyentrien')
 DELEMITER;
 
+
+/* -------------------------------- Specialities_Function --------------------------------*/
+DELIMITER $$
+create function isExist_Specialities_func(id int) returns int
+DETERMINISTIC
+BEGIN
+  DECLARE rowNumber int;
+select count(*) into rowNumber from specialities where specialityId = id;
+  RETURN rowNumber;
+END;    
+DELEMITER;
+
+DELIMITER $$
+create function isExist_SpecialitiesFromDoctor_func(id int) returns int
+DETERMINISTIC
+BEGIN
+  DECLARE rowNumber int;
+select count(*) into rowNumber from doctors where specialityId = id;
+  RETURN rowNumber;
+END;    
+DELEMITER;
+
+
+drop function isExist_NameSpec_Func
+DELIMITER $$
+create function isExist_NameSpec_Func(nameSpec varchar(50)) returns int
+DETERMINISTIC
+begin
+ declare rowNumber int;
+ select count(*) into rowNumber from specialities where speciallityName = nameSpec;
+ return	 rowNumber;
+end;
+DELIMITER;
+select isExist_NameSpec_Func("họng");
+/* ----------------------------------End_Specialities_Fuunction----------------------------------- */
+
+/* ------------------------------------Admins_Function-------------------------------------------- */
+DELIMITER $$
+create function isExist_Specialities_func(id int) returns int
+DETERMINISTIC
+BEGIN
+  DECLARE rowNumber int;
+select count(*) into rowNumber from specialities where specialityId = id;
+  RETURN rowNumber;
+END;    
+DELEMITER;
+
+DELIMITER $$
+create function isExist_SpecialitiesFromDoctor_func(id int) returns int
+DETERMINISTIC
+BEGIN
+  DECLARE rowNumber int;
+select count(*) into rowNumber from doctors where specialityId = id;
+  RETURN rowNumber;
+END;    
+DELEMITER;
+
+
+
