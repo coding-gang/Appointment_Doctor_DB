@@ -137,64 +137,46 @@ call show_All_Doctor()
   /*SPECIALITIES*/
   DELIMITER $$
   create procedure `Show_All_Specialities_Proc`
-  
   DELIMITER;
-  
-     DELIMITER $$
+  drop procedure Add_Specialities_Proc
+DELIMITER $$ 
 CREATE  PROCEDURE `Add_Specialities_Proc`(IN speciallityNameParam varchar(50))
 BEGIN
-declare result varchar(50);
-if not exists(select *  from specialities where  speciallityName = speciallityNameParam) then
 		insert into specialities(`speciallityName`) values(speciallityNameParam);
-        set result ="Thêm Chuyên ngành thành công";
-        select result;
-else 
-      set result="Đã tồn tại tên chuyên ngành trong cơ sở dữ liêu";
-      select result;
-end if;
+        select "Thêm Chuyên ngành thành công" as message;
 END;
 DELEMITER ;   
-call Add_Specialities_Proc('Răng');
+call Add_Specialities_Proc('Tim');
 
 ----------------------------------------
+drop PROCEDURE `Update_Specialities_Proc`
+DELIMITER $$
 CREATE DEFINER=`root`@`localhost` PROCEDURE `Update_Specialities_Proc`(in idParem int, in specialitiesParam varchar(50))
 BEGIN
-declare result varchar(50);
-if exists (select * from specialities where specialityId =  idParem) and  
-exists(select * from specialities where specialityId =  idParem and speciallityName <>specialitiesParam) 
-	then
     update specialities set specialities.speciallityName = specialitiesParam where specialities.specialityId =idParem;
-    set result = "Cập nhật thành công";
-    select result;
-else
-	set result = "Kiểm tra lại thông tin cập nhât";
-    select result;
-end if;
-END
-call Update_Specialities_Proc(4,'Răng');
+    select "Cập nhật chuyên ngành thành công" AS message;
+END;
+DELIMITER;
+call Update_Specialities_Proc(4,'Họng');
 ------------------------------------------------
-CREATE DEFINER=`root`@`localhost` PROCEDURE `Del_Specialities_Proc`(idParam int)
+DELIMITER $$
+CREATE PROCEDURE Del_Specialities_Proc(idParam int)
 BEGIN
-declare result nvarchar(50);
-if not exists(select * from doctors where specialityId = idParam) 
-	and exists (select * from specialities where specialityId = idParam ) then
+declare message varchar(50);
     delete from specialities where specialityId = idParam;
-    set result = "Xoá dữ liệu thành công";
-    select result;
-else 
-	set result = "Xoá dữ liệu thất bại";
-     select result;
-end if;
-
-END
+    set message = "Xoá dữ liệu thành công";
+    select message;
+END $$
+DELIMITER ;
+call Del_Specialities_Proc(8);
 call Del_Specialities_Proc(3);
 
  /* END SPECIALITIES*/
 /* -- END STORE PROCEDURES--*/
-drop procedure show_All_Doctor
+drop procedure show_All_Doctor;
 
 /* patients */
-select * from patients
+select * from patients;
 
 drop procedure Add_Patient_Proc;
 DELIMITER %%
@@ -323,24 +305,8 @@ call Del_Scheduletimings_Proc(24);
 /* ------End_Scheduletimings_Proc ------ */
 
 /* ------Amind_Proc ------ */
-CREATE DEFINER=`root`@`localhost` PROCEDURE `Add_Admin_Proc`(
-username varchar(50),
-password varchar(50),
-roleId int
-)
-BEGIN
-declare isExistUser int;
-set isExistUser = (select IsExist_UserName_func(username));
-if(isExistUser <= 0) then
-	insert into admins(userName,password,roleId) values(username,password,roleId);
-     select concat('Thêm người dùng ',username,' thành công');
-else
-	select concat('Đã tồn tại ',username,' trong csdl');
-end if;
-END;
-call Add_Admin_Proc('adads','adads',1)
-select * from admins
-
+drop procedure Update_Amind_Proc
+DELIMITER $$
 CREATE DEFINER=`root`@`localhost` PROCEDURE `Update_Amind_Proc`(
 id int,
 username varchar(50),
@@ -348,18 +314,14 @@ pass varchar(50),
 rolId int
 )
 BEGIN
-declare isExistUser int;
-set isExistUser = (select IsExist_UserName_func(username));
-if(isExistUser <= 0) or exists(select * from admins where adminId = id and( password <> pass or roleId <> rolId)) then
 	update admins set adminId = id, userName = username, password = pass , roleId = rolId 
     where adminId = id;
-    select "cập nhật dữ liệu thành công";
-else
-	select concat('Cập nhật không thay đổi');
-end if;
-END
-call Update_Amind_Proc(3,'tèo','123',1);
+END;
+DELIMITER;
+call Update_Amind_Proc(3,'tèo em','123',1);
 
+drop procedure Add_Admin_Proc
+DELIMITER $$
 CREATE DEFINER=`root`@`localhost` PROCEDURE `Add_Admin_Proc`(
 username varchar(50),
 password varchar(50),
@@ -367,24 +329,19 @@ roleId int
 )
 BEGIN
 declare isExistUser int;
-set isExistUser = (select IsExist_UserName_func(username));
-if(isExistUser <= 0) then
 	insert into admins(userName,password,roleId) values(username,password,roleId);
-     select concat('Thêm người dùng ',username,' thành công');
-else
-	select concat('Đã tồn tại ',username,' trong csdl');
-end if;
 END;
+DELIMITER;
 
-DELIMITER %%
+drop procedure Del_Admins_Proc
+DELIMITER $$
 CREATE DEFINER=`root`@`localhost` PROCEDURE `Del_Admins_Proc`(in id int)
 BEGIN
 delete from admins where adminId =id;
-select "Xoá dữ liệu thành công";
 END;
 DELIMITER;
- call Del_Admins_Proc(5);
- DELIMITER;
+call Del_Admins_Proc(4);
+select * from admins
  
  drop procedure SHOW_ALL_ADMINS_PROC
  DELIMITER %%

@@ -73,6 +73,7 @@ select * from patients;
 call SHOW_ALL_BY_TABLE_NAME('doctors');
 SHOW FULL TABLES IN appointmentbookingdoctor WHERE TABLE_TYPE LIKE 'VIEW';
 
+
 create view adminsView
 as
 select adminId,userName, password, nameRole from admins a

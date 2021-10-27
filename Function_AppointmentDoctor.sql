@@ -29,17 +29,7 @@ select print_MessageForRoles_func(1,'doctor')
 DELEMITER;
 /* --- END FUNCTION-ROLES ---*/
 
-drop function IsExist_UserName_func
-DELIMITER $$
-CREATE FUNCTION IsExist_UserName_func(name varchar(50)) returns int
-DETERMINISTIC
-BEGIN
-  DECLARE rowNumber int;
-select count(*) into rowNumber  from admins where username like concat("%",name,"%");
 
-  RETURN rowNumber;
-END;
-DELEMITER;
 SELECT IsExist_UserName_func('nguyentrien');
 DELIMITER $$
 CREATE FUNCTION  print_MessageForAdmin_func(rowNumber int,name varchar(50)) returns varchar(50)
@@ -90,7 +80,7 @@ begin
  return	 rowNumber;
 end;
 DELIMITER;
-select isExist_NameSpec_Func("họng");
+select isExist_NameSpec_Func("căc");
 /* ----------------------------------End_Specialities_Fuunction----------------------------------- */
 
 /* ------------------------------------Admins_Function-------------------------------------------- */
@@ -113,6 +103,43 @@ select count(*) into rowNumber from doctors where specialityId = id;
   RETURN rowNumber;
 END;    
 DELEMITER;
+
+/* -----------------------Admin_Function ---------------------------*/
+
+DELIMITER $$
+create function isExist_RoleFromAdmin_Func(idrole int) returns int
+begin 
+declare rowNumber int;
+select count(*) into rowNumber from roles where roleId = idrole;
+return rowNumber;
+end;
+DELIMITER;
+select isExist_RoleFromAdmin_Func(3);
+
+
+drop function isExist_UsernameFromAdmin_Func
+DELIMITER $$;
+create function isExist_UsernameFromAdmin_Func(nameUser varchar(50)) returns int
+DETERMINISTIC
+begin
+declare	rowNumber int;
+select count(*) into rowNumber from admins where userName = nameUser;
+return rowNumber;
+end;
+DELIMITER;
+select isExist_UsernameFromAdmin_Func("Nguyen Dinh Phat")
+select * from admins
+
+DELIMITER $$;
+create function isExist_Admin_Func(id int) returns int
+DETERMINISTIC
+begin
+declare	rowNumber int;
+select count(*) into rowNumber from admins where adminId = id;
+return rowNumber;
+end;
+DELIMITER;
+select isExist_Admin_Func(2)
 
 
 
