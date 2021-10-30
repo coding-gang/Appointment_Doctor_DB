@@ -55,29 +55,41 @@ select @out_id;
 /*END ROLES*/
 /*--------------------------------------------------------------*/
  /* DOCTOR*/
-DELIMITER %%
-CREATE  PROCEDURE Add_Doctor_Proc(
+ drop procedure Add_Doctor_Proc
+DELIMITER $$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `Add_Doctor_Proc`(
 firstName varchar(50),
 lastName varchar(50),
 phone varchar(10),
 DOB date,
 gender bit,
 address varchar(50),
-password varchar(50),
+pass varchar(50),
 specialityId int,
-roleId int
+roleId int,
+mail varchar(50)
 )
 BEGIN
-declare result varchar(50);
-insert into doctors(firstName,lastName, phone,DOB,gender,address,password,specialityId,roleId) 
-values(firstName,lastName,phone,DOB,gender,address, password, specialityId,roleId);
-set result = "Thêm dữ liệu thành công";
-select result;
+insert into doctors(firstName,lastName, phone,DOB,gender,address,password,specialityId,roleId,Email) 
+values(firstName,lastName,phone,DOB,gender,address, password(pass), specialityId,roleId,mail);
 END;
 DELEMITER ;
-call Add_Doctor_Proc('B','Nguyễn Đình Phát','0915261627','1999-09-03',1,'29 Ngô Gia Tự','123',4,2);
-call Add_Doctor_Proc('Tý','Nguyễn Văn', '0909190011','2000-09-23',1,'Trân phú','233',1,1);
+set @tr = AES_ENCRYPT('trien','pass123');
+call Add_Doctor_Proc('Echo','Nguyễn Văn', '0909190011','2000-09-23',1,'Trân phú','codelade',4,2,'nguyentrienmahoa@gmail.com');
+
+-----------------
+DELIMITER $$
+create procedure `Update_Password_Doctor_Proc`(pass varchar(50), id int)
+begin 
+	update doctors set password = password(pass) where doctorId = id;
+end;
+DELIMITER;
+select * from doctors where doctorId = 32
+call Update_Password_Doctor_Proc('hi',32)
+*B6BDA741F59FE8066344FE3E118291C5D7DD12AD
+
 --------------------------------
+DELIMITER $$
 CREATE DEFINER=`root`@`localhost` PROCEDURE `Update_Doctor_Proc`(
 in id int,
 fName varchar(50),
@@ -86,27 +98,17 @@ phoneNumber varchar(10),
 dob date,
 genderParam bit,
 addr varchar(50),
-pass varchar(50),
 specId int,
 rolId int
 )
 BEGIN
-declare result varchar(50);
-if exists (select * from doctors where doctorId = id) and
-	 exists(select * 
-    from doctors
-    where doctorId = id and (firstName <> fName or lastName <> lName or DOB <> dob or phone <> phoneNumber or
-    gender <> genderParam or address <> addr or password <> pass or specialityId <> specId or roleId <> rolId)) then
-    update doctors set firstName = fName , lastName =lName ,DOB = dob ,phone = phoneNumber ,
-    gender = genderParam , address =addr , password = pass , specialityId = specId , roleId = rolId
+    update doctors set firstName = fName , lastName =lName ,DOB = dob ,phone = phoneNumber,
+    gender = genderParam , address =addr , specialityId = specId , roleId = rolId
     where doctorId = id;
-    set result = "Cập nhật dữ liệu thành công";
-    select result;
-else 
-    set result ="Cập nhât dữ liệu thất bại";
-    select result;
-end if;
-END
+END;
+DELIMITER;
+call Update_Doctor_Proc(16,'Tý','Nguyễn Văn', '0909190011','2000-09-23',1,'Trân phú B',4,2)
+
 ----------------------------
 CREATE DEFINER=`root`@`localhost` PROCEDURE `Del_Doctor_Proc`(in id int)
 BEGIN

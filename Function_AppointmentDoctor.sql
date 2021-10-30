@@ -105,7 +105,6 @@ END;
 DELEMITER;
 
 /* -----------------------Admin_Function ---------------------------*/
-
 DELIMITER $$
 create function isExist_RoleFromAdmin_Func(idrole int) returns int
 begin 
@@ -141,5 +140,45 @@ end;
 DELIMITER;
 select isExist_Admin_Func(2)
 
+ SET block_encryption_mode = 'aes-256-cbc';
+ SET @key_str = SHA2('My secret passphrase',512);
+SET @init_vector = RANDOM_BYTES(16);
+SET @crypt_str = AES_ENCRYPT('text',@key_str,@init_vector);
+ SELECT AES_DECRYPT(@crypt_str,@key_str,@init_vector);
+ 
+ ---------------------
+DELIMITER $$
+create function `Encrypt_Pass_Function`(textEncrypt varchar(50),mykey varchar(50)) returns VARCHAR(50)
+begin
+declare result varchar(50);
+set result = aes_encrypt(textEncrypt,SHA2(mykey,512));
+return result;
+end;
+DELIMITER;
+select Encrypt_Pass_Function('nguyesdntrienv','key') as trEn;
+
+drop function Decreypt_Pass_Function
 
 
+/* ------------------------- Doctor-Function ---------------------*/
+DELIMITER $$ 
+create function `isExistPassOfDoctor_Func`(id int,pass varchar(50)) returns int
+begin
+declare rowNumber int;
+select count(*) into rowNumber from doctors where doctorId = id and password = password(pass);
+return rowNumber;
+end;
+DELIMITER;
+select isExistPassOfDoctor_Func(32,'hi');
+
+DELIMITER $$
+create function `VerifyPassWord`(newPass varchar(50), verifyPass varchar(50)) returns int
+begin 
+declare result int;
+	if(newPass = verifyPass) then
+		set result = 1;
+	else
+		set result =0;
+end if;
+end;
+DELIMITER;
