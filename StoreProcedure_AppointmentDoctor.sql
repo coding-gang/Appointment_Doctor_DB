@@ -1,4 +1,4 @@
-
+use `appointmentbookingdoctor`
 /*-- STORE PROCEDURES --*/
 /* ROLES*/
 drop procedure Add_Role_Proc
@@ -55,7 +55,7 @@ select @out_id;
 /*END ROLES*/
 /*--------------------------------------------------------------*/
  /* DOCTOR*/
- drop procedure Add_Doctor_Proc
+ drop procedure Add_Doctor_Proc	
 DELIMITER $$
 CREATE DEFINER=`root`@`localhost` PROCEDURE `Add_Doctor_Proc`(
 firstName varchar(50),
@@ -71,10 +71,24 @@ mail varchar(50)
 )
 BEGIN
 insert into doctors(firstName,lastName, phone,DOB,gender,address,password,specialityId,roleId,Email) 
-values(firstName,lastName,phone,DOB,gender,address, password(pass), specialityId,roleId,mail);
-END;
-DELEMITER ;
-set @tr = AES_ENCRYPT('trien','pass123');
+values(firstName,lastName,phone,DOB,gender,address, pass, specialityId,roleId,mail);
+ SELECT 
+        `dt`.`doctorId` AS `doctorId`,
+        `dt`.`firstName` AS `firstName`,
+        `dt`.`lastName` AS `lastName`,
+        `dt`.`phone` AS `phone`,
+        `dt`.`DOB` AS `DOB`,
+        `dt`.`address` AS `address`,
+        `sp`.`speciallityName` AS `speciallityName`,
+        `rl`.`nameRole` AS `nameRole`,
+        `dt`.`Email` AS `email`
+    FROM
+        ((`appointmentbookingdoctor`.`doctors` `dt`
+        LEFT JOIN `appointmentbookingdoctor`.`specialities` `sp` ON (`dt`.`specialityId` = `sp`.`specialityId`))
+        JOIN `appointmentbookingdoctor`.`roles` `rl` ON (`dt`.`roleId` = `rl`.`roleId`))
+	where email = mail;
+END $$;
+DELEMITER;
 call Add_Doctor_Proc('Echo','Nguyễn Văn', '0909190011','2000-09-23',1,'Trân phú','codelade',4,2,'nguyentrienmahoa@gmail.com');
 
 -----------------
@@ -86,7 +100,7 @@ end;
 DELIMITER;
 select * from doctors where doctorId = 32
 call Update_Password_Doctor_Proc('hi',32)
-*B6BDA741F59FE8066344FE3E118291C5D7DD12AD
+select * from specialities
 
 --------------------------------
 DELIMITER $$
@@ -415,5 +429,5 @@ DELIMITER;
 call Del_Appointment_Proc(5);
 
 /* ----- end appointment_proc ------------- */
-
+select * from ViewDoctor
 
