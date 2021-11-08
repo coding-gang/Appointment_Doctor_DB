@@ -39,6 +39,8 @@ ON DELETE CASCADE on update cascade,
 roleId int,
 FOREIGN KEY (roleId) REFERENCES roles(roleId) ON DELETE CASCADE on update cascade
 );
+Del_Doctor_ProcDel_Doctor_Procalter table doctors
+modify password varchar(100);
 
 create table `scheduleTimings`(
 scheduleTimingId int key not null AUTO_INCREMENT,

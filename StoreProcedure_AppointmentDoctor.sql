@@ -64,7 +64,7 @@ phone varchar(10),
 DOB date,
 gender bit,
 address varchar(50),
-pass varchar(50),
+pass varchar(100),
 specialityId int,
 roleId int,
 mail varchar(50)
@@ -99,10 +99,11 @@ begin
 end;
 DELIMITER;
 -----------------
+drop procedure Update_Password_Doctor_Proc
 DELIMITER $$
-create procedure `Update_Password_Doctor_Proc`(pass varchar(50), id int)
+create procedure `Update_Password_Doctor_Proc`(pass varchar(100), id int)
 begin 
-	update doctors set password = password(pass) where doctorId = id;
+	update doctors set password = pass where doctorId = id;
 end;
 DELIMITER;
 select * from doctors where doctorId = 32

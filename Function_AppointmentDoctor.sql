@@ -146,29 +146,8 @@ select isExist_Admin_Func(2)
 
 
 /* ------------------------- Doctor-Function ---------------------*/
-drop function isExistPassOfDoctor_Func
-DELIMITER $$ 
-create function `isExistPassOfDoctor_Func`(id int,pass varchar(50)) returns int
-begin
-declare rowNumber int;
-select count(*) into rowNumber from doctors where doctorId = id and password = pass;
-return rowNumber;
-end;
-DELIMITER;
-select isExistPassOfDoctor_Func(48,'$2b$10$pMH.4CzSV3MtDktw6Lonm.1p3oxBKme4WkOJYa.T7iy');
-select * From doctors
 
-DELIMITER $$
-create function `VerifyPassWord`(newPass varchar(50), verifyPass varchar(50)) returns int
-begin 
-declare result int;
-	if(newPass = verifyPass) then
-		set result = 1;
-	else
-		set result =0;
-end if;
-end;
-DELIMITER;
+
 
 drop function isExist_UsernameFromDoctor_Func
 DELIMITER $$
@@ -184,15 +163,18 @@ DELIMITER;
 
 select isExist_UsernameFromDoctor_Func('tuan13@gmail.com');
 
+drop function getPassWord_Func
 DELIMITER $$
-	create function `getPassWord_Func`(id int) returns varchar(50)
+	create function `getPassWord_Func`(id int) returns varchar(100)
     begin
-		declare result varchar(50);
+		declare result varchar(100);
 		select password into result from doctors where doctorId = id;
         return result;
     end;
 DELIMITER;
-select getPassWord_Func(48)
-select * from doctors
+select getPassWord_Func(49)
+
+
+select * from doctors where password = '$2b$10$ujzh3nnEmHfI5F2PRwTaIONcHyotMd.HLTlqnCE.2pN'
 
 
