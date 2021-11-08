@@ -17,7 +17,7 @@ end;
 DELEMITER;
 call Add_Role_Proc('doctor');
 ------------------------------------------
-DELIMITER %%
+DELIMITER $$
 create procedure Show_Role_Proc()
   begin
     select * from roles;
@@ -34,7 +34,7 @@ DELEMITER;
 call Show_Role_ByName_Proc('doctor');
 -------------------------------------------------
 drop procedure Get_RoleId_ByName_Proc
-DELIMITER %%
+DELIMITER $$
 create procedure Get_RoleId_ByName_Proc(in name varchar(50),out roleIds int)
 begin
 declare isExist int;
@@ -72,7 +72,16 @@ mail varchar(50)
 BEGIN
 insert into doctors(firstName,lastName, phone,DOB,gender,address,password,specialityId,roleId,Email) 
 values(firstName,lastName,phone,DOB,gender,address, pass, specialityId,roleId,mail);
- SELECT 
+call getDoctorAdded_Proc(mail);
+END;
+DELEMITER;
+select * from admins;
+call Add_Doctor_Proc('Echo','Nguyễn Văn', '0909190011','2000-09-23',1,'Trân phú','codelade',4,2,'nguyentrienmahoa@gmail.com');
+DELIMITER $$
+select * from doctors
+create procedure getDoctorAdded_Proc(mail varchar(50))
+begin
+	SELECT 
         `dt`.`doctorId` AS `doctorId`,
         `dt`.`firstName` AS `firstName`,
         `dt`.`lastName` AS `lastName`,
@@ -87,10 +96,8 @@ values(firstName,lastName,phone,DOB,gender,address, pass, specialityId,roleId,ma
         LEFT JOIN `appointmentbookingdoctor`.`specialities` `sp` ON (`dt`.`specialityId` = `sp`.`specialityId`))
         JOIN `appointmentbookingdoctor`.`roles` `rl` ON (`dt`.`roleId` = `rl`.`roleId`))
 	where email = mail;
-END $$;
-DELEMITER;
-call Add_Doctor_Proc('Echo','Nguyễn Văn', '0909190011','2000-09-23',1,'Trân phú','codelade',4,2,'nguyentrienmahoa@gmail.com');
-
+end;
+DELIMITER;
 -----------------
 DELIMITER $$
 create procedure `Update_Password_Doctor_Proc`(pass varchar(50), id int)

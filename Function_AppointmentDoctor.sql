@@ -10,6 +10,8 @@ select count(*) into rowNumber  from roles where nameRole like concat("%",name,"
 END;
 DELEMITER;
 SELECT IsExist_NameRole_func('admin');
+
+select * from roles
 ---------------------------------------------
 drop function print_MessageForRoles_func
 DELIMITER $$
@@ -140,36 +142,21 @@ end;
 DELIMITER;
 select isExist_Admin_Func(2)
 
- SET block_encryption_mode = 'aes-256-cbc';
- SET @key_str = SHA2('My secret passphrase',512);
-SET @init_vector = RANDOM_BYTES(16);
-SET @crypt_str = AES_ENCRYPT('text',@key_str,@init_vector);
- SELECT AES_DECRYPT(@crypt_str,@key_str,@init_vector);
- 
- ---------------------
-DELIMITER $$
-create function `Encrypt_Pass_Function`(textEncrypt varchar(50),mykey varchar(50)) returns VARCHAR(50)
-begin
-declare result varchar(50);
-set result = aes_encrypt(textEncrypt,SHA2(mykey,512));
-return result;
-end;
-DELIMITER;
-select Encrypt_Pass_Function('nguyesdntrienv','key') as trEn;
 
-drop function Decreypt_Pass_Function
 
 
 /* ------------------------- Doctor-Function ---------------------*/
+drop function isExistPassOfDoctor_Func
 DELIMITER $$ 
 create function `isExistPassOfDoctor_Func`(id int,pass varchar(50)) returns int
 begin
 declare rowNumber int;
-select count(*) into rowNumber from doctors where doctorId = id and password = password(pass);
+select count(*) into rowNumber from doctors where doctorId = id and password = pass;
 return rowNumber;
 end;
 DELIMITER;
-select isExistPassOfDoctor_Func(32,'hi');
+select isExistPassOfDoctor_Func(48,'$2b$10$pMH.4CzSV3MtDktw6Lonm.1p3oxBKme4WkOJYa.T7iy');
+select * From doctors
 
 DELIMITER $$
 create function `VerifyPassWord`(newPass varchar(50), verifyPass varchar(50)) returns int
@@ -182,3 +169,30 @@ declare result int;
 end if;
 end;
 DELIMITER;
+
+drop function isExist_UsernameFromDoctor_Func
+DELIMITER $$
+create function isExist_UsernameFromDoctor_Func(mail varchar(50)) returns int
+DETERMINISTIC
+begin
+declare	rowNumber int;
+select count(*) into rowNumber from doctors where email = mail;
+return rowNumber;
+end;
+DELIMITER;
+
+
+select isExist_UsernameFromDoctor_Func('tuan13@gmail.com');
+
+DELIMITER $$
+	create function `getPassWord_Func`(id int) returns varchar(50)
+    begin
+		declare result varchar(50);
+		select password into result from doctors where doctorId = id;
+        return result;
+    end;
+DELIMITER;
+select getPassWord_Func(48)
+select * from doctors
+
+
