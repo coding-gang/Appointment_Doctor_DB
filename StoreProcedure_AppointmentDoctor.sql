@@ -329,6 +329,15 @@ call Del_Scheduletimings_Proc(24);
 /* ------End_Scheduletimings_Proc ------ */
 
 /* ------Amind_Proc ------ */
+DELIMITER $$
+CREATE  PROCEDURE `Update_Password_Admin_Proc`(pass varchar(100), id int)
+begin 
+	update admins set password = pass where adminId = id;
+end;
+DELIMITER;
+call Update_Password_Admin_Proc('3432',10)
+select *from admins
+
 drop procedure Update_Amind_Proc
 DELIMITER $$
 CREATE DEFINER=`root`@`localhost` PROCEDURE `Update_Amind_Proc`(

@@ -124,7 +124,7 @@ create function isExist_UsernameFromAdmin_Func(nameUser varchar(50)) returns int
 DETERMINISTIC
 begin
 declare	rowNumber int;
-select count(*) into rowNumber from admins where userName = nameUser;
+select count(*) into rowNumber from admins where userNameuserName = nameUser;
 return rowNumber;
 end;
 DELIMITER;
@@ -174,7 +174,17 @@ DELIMITER $$
 DELIMITER;
 select getPassWord_Func(49)
 
+drop function getPassWord_Admin_Func
+DELIMITER $$
+	create function `getPassWord_Admin_Func`(id int) returns varchar(100)
+    begin
+		declare result varchar(100);
+		select password into result from admins where adminId = id;
+        return result;
+    end;
+DELIMITER;
+select getPassWord_Admin_Func(1)
 
-select * from doctors where password = '$2b$10$ujzh3nnEmHfI5F2PRwTaIONcHyotMd.HLTlqnCE.2pN'
+select * from admins;
 
 
