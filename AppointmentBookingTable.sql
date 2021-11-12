@@ -82,3 +82,5 @@ as
 select adminId,userName, password, nameRole from admins a
 inner join roles r on r.roleId = a.roleId;
 select * from admins
+
+

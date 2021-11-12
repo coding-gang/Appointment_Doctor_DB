@@ -1,4 +1,5 @@
 /*---FUNCTION-ROLES---*/
+
 drop function IsExist_NameRole_func
 DELIMITER $$
 CREATE FUNCTION IsExist_NameRole_func(name varchar(50)) returns int
@@ -175,6 +176,7 @@ DELIMITER;
 select getPassWord_Func(49)
 
 drop function getPassWord_Admin_Func
+
 DELIMITER $$
 	create function `getPassWord_Admin_Func`(id int) returns varchar(100)
     begin
@@ -186,5 +188,7 @@ DELIMITER;
 select getPassWord_Admin_Func(1)
 
 select * from admins;
+
+
 
 

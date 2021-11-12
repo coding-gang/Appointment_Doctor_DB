@@ -363,8 +363,19 @@ roleId int
 BEGIN
 declare isExistUser int;
 	insert into admins(userName,password,roleId) values(username,password,roleId);
+    call get_Admin_Added(username);
 END;
 DELIMITER;
+
+DELIMITER $$
+create procedure `get_Admin_Added`(mail varchar(50))
+begin
+	select adminId,userName, nameRole 
+    from adminsView 
+    where userName = mail;
+end;
+DELIMITER;
+
 
 drop procedure Del_Admins_Proc
 DELIMITER $$
@@ -447,4 +458,10 @@ call Del_Appointment_Proc(5);
 
 /* ----- end appointment_proc ------------- */
 select * from ViewDoctor
+DELIMITER $$ 
+create procedure `getDetailDoctotByEmail_proc`(mail varchar(50))
+begin 
+	select * from ViewDoctor where email = mail;
+end;
+DELIMITER;
 
