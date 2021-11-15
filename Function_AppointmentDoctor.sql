@@ -185,9 +185,55 @@ DELIMITER $$
         return result;
     end;
 DELIMITER;
-select getPassWord_Admin_Func(1)
 
-select * from admins;
+/*------------------------------------------ Function scheduleTimg-------------------------*/
+DELIMITER$$
+CREATE DEFINER=`root`@`localhost` FUNCTION `checkTiming`(bDate date , aTime time, eTime time) RETURNS int(11)
+BEGIN
+if (date(bDate) >=  CURDATE()) then
+	if(time(aTime) > current_time() and time(eTime) > current_time()) then
+		if(aTime < eTime and aTime <> eTime  ) then
+			return 1;
+		else
+			return 2;
+        end if;
+	else
+		return 3;
+	end if;
+else 
+	return 0;
+end if;
+END;
+DELIMITER;
+
+DELIMTER $$
+CREATE DEFINER=`root`@`localhost` FUNCTION `checkExistTiming`(dayAdd date, startTime time,  endTime time, idDoc int) RETURNS int(11)
+BEGIN
+if not exists (select * from scheduleTimings
+					where doctorId = idDoc 
+                    and( time(startTime) between time(atBegin) and time(atEnd)
+						or time(endTime) between time(atBegin) and time(atEnd)
+                        or time(atBegin) between time(startTime) and time(endTime)
+                        or time(atEnd) between time(startTime) and time(endTime))
+                    )  then
+	return 1;
+else 
+	if exists (select * from scheduleTimings
+					where doctorId = idDoc and( time(startTime) between time(atBegin) and time(atEnd))) then
+                    return 2;
+	elseif exists (select * from scheduleTimings
+					where doctorId = idDoc and(time(endTime) between time(atBegin) and time(atEnd))) then
+                    return 3;
+	else
+		return 0;
+	end if;
+end if;
+END;
+DELIMITER;
+
+
+
+
 
 
 

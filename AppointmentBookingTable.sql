@@ -81,6 +81,13 @@ create view adminsView
 as
 select adminId,userName, password, nameRole from admins a
 inner join roles r on r.roleId = a.roleId;
-select * from admins
+select * from admins;
+call Add_Scheduletiming_Proc('2021-09-03','09:30:00','10:00:00',1);
+select * from scheduleTimings;
+select * from doctors;
+select  checkExistTiming('2021-09-03','08:30','9:29',1);
+call Add_Scheduletiming_Proc('2021-09-03','08:30','9:29',49);
+call Update_Scheduletimings_Proc(51,'2021-11-15','18:00','19:30');
 
+update scheduleTimings set status =1 where scheduleTimingId =48
 

@@ -457,11 +457,104 @@ DELIMITER;
 call Del_Appointment_Proc(5);
 
 /* ----- end appointment_proc ------------- */
-select * from ViewDoctor
-DELIMITER $$ 
-create procedure `getDetailDoctotByEmail_proc`(mail varchar(50))
-begin 
-	select * from ViewDoctor where email = mail;
-end;
+
+
+DELIMITER $$
+  create procedure getDetailDoctotByEmail_proc(email varchar(50))
+  begin
+        select
+	dt.doctorId,dt.firstName,dt.lastName,dt.phone,dt.DOB,dt.address,dt.password,
+    dt.email,sp.speciallityName,rl.nameRole
+	from doctors dt
+	left join specialities sp on dt.specialityId =sp.specialityId
+	inner join roles rl on dt.roleId = rl.roleId
+    where dt.email = email;
+  end $$
+DELIMITER  
+
+select * from admins
+select * from roles
+drop procedure getDetailAdminByUsername_proc
+DELIMITER $$
+  create procedure getDetailAdminByUsername_proc(userN varchar(50))
+  begin
+        select
+		ad.adminId, ad.userName, rl.nameRole, ad.password
+	from admins ad
+	inner join roles rl on ad.roleId = rl.roleId
+    where ad.userName = userN;
+  end $$
+DELIMITER  
+
+
+DELIMITER $$
+	create function getPassWord_Admin_Func (id int) returns varchar(100)
+    DETERMINISTIC
+    begin
+		declare result varchar(100);
+		select password into result from admins where adminId = id;
+        return result;
+    end;
+DELIMITER;
+select * from doctors
+select * from scheduleTimings
+Modify COLUMN status tinyInt DEFAULT 0
+call getScheduleUpdated(51)
+select curtime()
+
+/* --------------------------------- Schedule Procedure ------------------------------*/
+DELIMITER $$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `Add_Scheduletiming_Proc`(
+bDate date,
+timeB Time,
+timeE Time,
+docId int
+)
+BEGIN
+	insert into scheduletimings(`bookDate`,`atBegin`,`atEnd`,`doctorId`) values (bDate,timeB, timeE, docId);
+	call getScheduleAdded(timeB,timeE,docId);
+END;
 DELIMITER;
 
+DELIMITER$$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `getScheduleAdded`(startTime time,endTime time, docId int)
+BEGIN
+	select bookDate, atBegin, atEnd from scheduleTimings where (atBegin = startTime or atEnd = endTime) and doctorId = docId;
+END;
+DELIMITER;
+
+DELIMITER $$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `Update_Scheduletimings_Proc`(
+id int,
+bDate date,
+startTime Time,
+endTime Time
+)
+BEGIN
+	update Scheduletimings set bookDate = bDate , atBegin= startTime, atEnd =endTime
+    where scheduleTimingId = id;
+     call getScheduleUpdated(id);
+END;
+DELIMITER;
+
+DELIMITER $$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `getScheduleUpdated`(id int)
+BEGIN
+select bookDate, atBegin, atEnd from scheduleTimings where scheduleTimingId = id;
+END;
+DELIMITER;
+
+DELIMITER $$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `Del_Scheduletimings_Proc`(in id int)
+BEGIN
+declare result varchar(50);
+if exists(select * from scheduletimings where scheduleTimingId = id and status =0) then
+    set result ="Xoá dữ liệu thành công";
+    delete from scheduletimings where scheduleTimingId = id;
+    select result;
+else
+	set result = "Khách hàng đã đặt lich. Không thể xoá lịch này";
+    select result;
+end if;
+END;
+DELIMITER;
