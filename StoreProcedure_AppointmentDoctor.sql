@@ -558,3 +558,19 @@ else
 end if;
 END;
 DELIMITER;
+select * from roles
+select * from ViewDoctor
+
+
+
+/* ----------------------------Patient Procedure ---------------------------*/
+alter table patients 
+change email username varchar(50)
+modify gender tinyint(4)
+
+select * from patients
+create view patientView as
+select patientId,firstName, lastName, username,gender,nameRole
+from patients p
+join roles r on (r.roleId = p.roleId);
+select * from patientView
