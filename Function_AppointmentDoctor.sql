@@ -231,9 +231,9 @@ end if;
 END;
 DELIMITER;
 
-
-
-
+select * from patients
+select * from appointments
+insert into appointments values('')
 
 
 

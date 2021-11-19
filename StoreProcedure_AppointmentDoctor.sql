@@ -568,9 +568,104 @@ alter table patients
 change email username varchar(50)
 modify gender tinyint(4)
 
-select * from patients
+
+select * from scheduleTimings
+
+select * from patients  
+
+
 create view patientView as
-select patientId,firstName, lastName, username,gender,nameRole
+select patientId,firstName, lastName, username,phone,gender,nameRole
 from patients p
 join roles r on (r.roleId = p.roleId);
 select * from patientView
+call Add_Patient_Proc ('tuan','nguyen','trien12','0909190011',1,'123',1);
+alter table patients
+modify password varchar(100)
+select *from patients
+select * from patientView where patientId = 7;
+
+DELIMITER $$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `getDetailPatientByUsername_proc`(userN varchar(50))
+begin
+        select
+		p.patientId, p.userName, p.firstname,p.lastname,rl.nameRole, p.password
+	from patients p
+	inner join roles rl on p.roleId = rl.roleId
+    where p.username = userN;
+  end;
+DELIMITER;
+
+DELIMITER $$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `Add_Patient_Proc`(
+fName varchar(50),
+lName varchar(50),
+nameuser varchar(50),
+phoneNumber varchar(10),
+gender tinyInt(4),
+password varchar(100),
+roleId int
+)
+begin 
+	insert into patients(`firstName`,`lastName`,`username`,`phone`,`gender`,`password`,`roleId`)
+	values(fName,lName,nameuser,phoneNumber,gender,password,roleId);
+	select * from patientView where username = nameuser;
+end;
+DELIMITER;
+
+DELIMITER $$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `Update_Patient_Proc`(
+paId int,
+fName varchar(50),
+lName varchar(50),
+phoneNumber varchar(10),
+gt tinyint
+)
+BEGIN
+	 update patients set firstName = fName, lastName = lName, phone = phoneNumber,
+    gender = gt where patientId = paId; 
+    select * from patientView where patientId = paId;
+END;
+DELIMITER;
+
+DELIMITER $$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `Del_Patient_Proc`(in id int)
+BEGIN
+    Delete from patients where patientId = id;
+END;
+DELIMITER;
+
+DELIMITER $$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `Update_Password_Patient_Proc`(pass varchar(100), id int)
+begin 
+	update patients set password = pass where patientId = id;
+end;
+DELIMITER;
+
+DELIMITER $$
+CREATE DEFINER=`root`@`localhost` FUNCTION `getPassWord_Patient_Func`(id int) RETURNS varchar(100) CHARSET utf8mb4
+begin
+		declare result varchar(100);
+		select password into result from patients where patientId = id;
+        return result;
+    end;
+DELIMITER;
+
+DELIMITER $$
+CREATE DEFINER=`root`@`localhost` FUNCTION `isExist_UsernameFromPatient_Func`(nameuser varchar(50)) RETURNS int(11)
+    DETERMINISTIC
+begin
+declare	rowNumber int;
+select count(*) into rowNumber from patients where username = nameuser;
+return rowNumber;
+end;
+DELIMITER;
+
+DELIMITER $$
+CREATE DEFINER=`root`@`localhost` FUNCTION `isExist_AppointmentFromPatient_Func`(id int) RETURNS int(11)
+begin 
+declare rowNumber int;
+select count(*) into rowNumber from appointments  where appointmentId = id;
+return rowNumber;
+end;
+DELIMITER;
