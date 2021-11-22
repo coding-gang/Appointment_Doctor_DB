@@ -669,3 +669,56 @@ select count(*) into rowNumber from appointments  where appointmentId = id;
 return rowNumber;
 end;
 DELIMITER;
+select * from scheduletimings
+select * from doctors
+select * from appointments
+
+/* - ---------------------Appointment ---------------*/
+create view appointmentDoctorView as
+select appointmentId,ap.patientId , CONCAT(p.lastName,' ',p.firstName) as fullName
+ ,sc.bookDate, sc.atBegin, sc.atEnd, sc.status 
+from appointments ap
+inner join  scheduleTimings sc on (ap.scheduleTimingId = sc.scheduleTimingId )
+inner join  patients p on (p.patientId = ap.patientId);
+
+drop view appointmentPatientView
+create view appointmentPatientView as
+select appointmentId,d.doctorId , CONCAT(d.lastName,' ',d.firstName) as fullName
+ ,sc.bookDate, sc.atBegin, sc.atEnd, sc.status 
+from appointments ap
+inner join  scheduleTimings sc on (ap.scheduleTimingId = sc.scheduleTimingId )
+inner join  doctors d on (d.doctorId = sc.doctorId);
+
+select * from appointmentPatientView
+select * from appointmentDoctorView
+select * from appointments
+
+DELIMITER $$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `Add_Appointments_Proc`(
+scheId int,
+paId int
+)
+BEGIN	
+         insert into Appointments(`scheduleTimingId`,`patientId`) values(scheId, paId);
+END;
+DELIMITER;
+
+DELIMITER $$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `Del_Appointments_Proc`(in id int)
+BEGIN
+ delete from appointments where appointmentId = id;
+END;
+DELIMITER;
+
+DELIMITER $$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `Update_Appointments_Proc`(
+appoinId int,
+scheId int,
+paId int)
+BEGIN
+         update appointments set `scheduleTimingId` = scheId , `patientId` =paId 
+         where appointmentId = appoinId;
+END; 
+DELIMITER;
+
+
